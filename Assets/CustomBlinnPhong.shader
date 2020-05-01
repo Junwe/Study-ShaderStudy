@@ -51,7 +51,7 @@
             RimColor = pow(invrim,1) * float3(0.5,0.5,0.5);
 
             DiffColor = ndotl * s.Albedo * _LightColor0.rgb * atten;
-            final.rgb = DiffColor + SpecColor.rgb * RimColor.rgb;
+            final.rgb = DiffColor + SpecColor.rgb + RimColor.rgb;
             final.a = s.Alpha;
 
             return final;

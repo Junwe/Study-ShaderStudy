@@ -2,7 +2,6 @@
 {
     Properties
     {
-        _OutLineTex("_OutLineTex", 2D) = "white" {}
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _OutLine("Outline",Range(0.01,1)) = 1
     }
@@ -21,7 +20,6 @@
         #pragma target 3.0
 
         float _OutLine;
-        sampler2D _OutLineTex;
 
 
         void vert(inout appdata_full v)
@@ -32,14 +30,10 @@
         struct Input
         {
             float4 color:COLOR;
-            float2 uv_OutLineTex;
         };
 
         void surf (Input IN, inout SurfaceOutput o)
         {
-            fixed4 c = tex2D(_OutLineTex,IN.uv_OutLineTex);
-            o.Albedo = c.rgb;
-            o.Alpha = c.a;
         }
         
          float4 LightingNoLight(SurfaceOutput s,float3 lightDir,float atten)
@@ -77,32 +71,20 @@
         {
             float ndotl = dot(s.Normal,lightDir) * 0.5 + 0.5;
 
-            if(ndotl >= 0.5)
+            if(ndotl >= 0.6)
             {
                 ndotl = 1;
             }
-            else
+            else if(ndotl >= 0.3)
             {
                 ndotl = 0.3;
             }
-
-            // float rim = abs(dot(s.Normal,viewDir));
-
-            // if(rim > 0.3)
-            // {
-            //     rim = 1;
-            // }
-            // else
-            // {
-            //     rim = -1;
-            // }
-
-            // float4 final;
-            // final.rgb = s.Albedo * ndotl * _LightColor0.rgb;
-            // final.a = s.Alpha;
+            else
+            {
+                ndotl = 0.1;
+            }
 
              return ndotl;
-            //return final;
         }
         ENDCG
     }
