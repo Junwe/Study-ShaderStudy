@@ -1,11 +1,9 @@
-﻿Shader "Custom/Fire2"
+﻿Shader "Custom/Rim"
 {
     Properties
     {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _MainTex2 ("Albedo (RGB)", 2D) = "black" {}
-
-        _testValue("testValue",float) = 0
+        _Color("Color",Color) = (1,1,1,1)
     }
     SubShader
     {
@@ -13,17 +11,17 @@
         LOD 200
 
         CGPROGRAM
-        #pragma surface surf Standard alpha:fade
+        #pragma surface surf Standard Lambert noambient alpha:fade
 
 
         sampler2D _MainTex;
-        sampler2D _MainTex2;
-        float _testValue;
+        float4 _Color;
 
         struct Input
         {
             float2 uv_MainTex;
-            float2 uv_MainTex2;
+            float3 viewDir;
+            float3 worldPos;
         };
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -35,11 +33,12 @@
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-            // Albedo comes from a texture tinted by color
-            fixed4 d = tex2D (_MainTex2, float2(IN.uv_MainTex2.x,IN.uv_MainTex2.y- _Time.y));
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex + (d.r * _testValue));
-            o.Emission = c.rgb;
-            o.Alpha = c.a;
+            fixed4 c = tex2D (_MainTex, IN.uv_MainTex );
+            //o.Albedo = c.rgb;
+            float rim = saturate(dot(o.Normal, IN.viewDir));
+            rim = pow(1-rim,3) + pow(frac(IN.worldPos.g * 3 - _Time.y),30);
+            o.Emission = float3(0,1,0);
+            o.Alpha = rim;
         }
         ENDCG
     }
